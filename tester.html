@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>Loop Tester — Background Maker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 100vw; height: 100vh; overflow: hidden;
+      background: #000; color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Video fills the screen */
+    video {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    /* Drop zone / file picker */
+    .drop-zone {
+      position: relative; z-index: 10;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 16px;
+      width: 480px; max-width: 90vw;
+      padding: 48px 32px;
+      border: 2px dashed rgba(255,255,255,0.15);
+      border-radius: 20px;
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(24px);
+      transition: border-color 0.2s, background 0.2s;
+      cursor: pointer;
+    }
+    .drop-zone.drag-over {
+      border-color: rgba(129,140,248,0.6);
+      background: rgba(129,140,248,0.08);
+    }
+    .drop-zone svg { opacity: 0.3; }
+    .drop-zone-title { font-size: 15px; font-weight: 600; opacity: 0.8; }
+    .drop-zone-sub { font-size: 12px; opacity: 0.35; }
+
+    .drop-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+    }
+
+    /* Overlay controls (visible on hover when video is playing) */
+    .overlay {
+      position: fixed; inset: 0; z-index: 20;
+      display: none; flex-direction: column;
+      align-items: center; justify-content: flex-end;
+      padding-bottom: 40px;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .overlay.active { display: flex; }
+    .overlay:hover { opacity: 1; }
+
+    .overlay-bar {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 12px 20px;
+      background: rgba(10,10,25,0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      min-width: 320px;
+    }
+
+    .overlay-top {
+      display: flex; align-items: center; gap: 12px;
+      width: 100%;
+    }
+
+    .overlay-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: rgba(255,255,255,0.7);
+      cursor: pointer; transition: all 0.15s;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .overlay-btn:hover { background: rgba(255,255,255,0.14); color: #fff; }
+
+    .overlay-label {
+      font-size: 12px; opacity: 0.5;
+      flex: 1; min-width: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* Timeline */
+    .timeline {
+      width: 100%;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .timeline-time {
+      font-size: 11px;
+      font-variant-numeric: tabular-nums;
+      opacity: 0.4;
+      flex-shrink: 0;
+      width: 36px;
+    }
+    .timeline-time.right { text-align: right; }
+
+    .timeline-track {
+      flex: 1; height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .timeline-progress {
+      height: 100%; border-radius: 2px;
+      background: rgba(129,140,248,0.7);
+      width: 0%;
+      pointer-events: none;
+    }
+
+    .timeline-loop-marker {
+      position: absolute; top: -6px; bottom: -6px;
+      width: 2px; background: rgba(255,200,50,0.6);
+      border-radius: 1px;
+      pointer-events: none;
+    }
+
+    /* Back link */
+    .back-link {
+      position: fixed; top: 16px; left: 16px; z-index: 30;
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px;
+      font-size: 12px; font-weight: 500;
+      color: rgba(255,255,255,0.5);
+      background: rgba(10,10,25,0.7);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .back-link:hover { color: #fff; background: rgba(255,255,255,0.1); }
+  </style>
+</head>
+<body>
+
+  <a href="./" class="back-link">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M8 3L4 7l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back to Editor
+  </a>
+
+  <!-- Drop zone -->
+  <div class="drop-zone" id="drop-zone">
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+      <path d="M14 28l10 10 10-10M24 38V14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="drop-zone-title">Drop video file here</div>
+    <div class="drop-zone-sub">or click to browse — MP4, WebM supported</div>
+    <input type="file" id="file-input" accept="video/*" />
+  </div>
+
+  <!-- Video -->
+  <video id="player" loop muted playsinline></video>
+
+  <!-- Overlay controls -->
+  <div class="overlay" id="overlay">
+    <div class="overlay-bar">
+      <div class="overlay-top">
+        <span class="overlay-label" id="file-label"></span>
+        <button class="overlay-btn" id="btn-pause" title="Pause / Play">
+          <svg id="icon-pause" width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="3" y="2" width="3" height="10" rx="0.5" fill="currentColor"/><rect x="8" y="2" width="3" height="10" rx="0.5" fill="currentColor"/></svg>
+          <svg id="icon-play" width="14" height="14" viewBox="0 0 14 14" fill="none" style="display:none"><path d="M4 2.5l7 4.5-7 4.5V2.5z" fill="currentColor"/></svg>
+        </button>
+      </div>
+      <div class="timeline">
+        <span class="timeline-time right" id="time-current">0:00</span>
+        <div class="timeline-track" id="timeline-track">
+          <div class="timeline-progress" id="timeline-progress"></div>
+        </div>
+        <span class="timeline-time" id="time-duration">0:00</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const player = document.getElementById('player');
+    const overlay = document.getElementById('overlay');
+    const fileLabel = document.getElementById('file-label');
+    const btnPause = document.getElementById('btn-pause');
+    const iconPause = document.getElementById('icon-pause');
+    const iconPlay = document.getElementById('icon-play');
+    const timeCurrent = document.getElementById('time-current');
+    const timeDuration = document.getElementById('time-duration');
+    const timelineTrack = document.getElementById('timeline-track');
+    const timelineProgress = document.getElementById('timeline-progress');
+
+    let rafId = null;
+
+    function fmt(sec) {
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${m}:${String(s).padStart(2, '0')}`;
+    }
+
+    function updateTimeline() {
+      if (!player.duration) return;
+      const pct = (player.currentTime / player.duration) * 100;
+      timelineProgress.style.width = `${pct}%`;
+      timeCurrent.textContent = fmt(player.currentTime);
+      rafId = requestAnimationFrame(updateTimeline);
+    }
+
+    function loadVideo(file) {
+      const url = URL.createObjectURL(file);
+      player.src = url;
+      player.style.display = 'block';
+      player.play();
+      dropZone.style.display = 'none';
+      overlay.classList.add('active');
+      fileLabel.textContent = file.name;
+      iconPause.style.display = '';
+      iconPlay.style.display = 'none';
+    }
+
+    // Update duration display once metadata is loaded
+    player.addEventListener('loadedmetadata', () => {
+      timeDuration.textContent = fmt(player.duration);
+      timeCurrent.textContent = fmt(0);
+      timelineProgress.style.width = '0%';
+    });
+
+    // Start/stop RAF-based timeline updates
+    player.addEventListener('play', () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(updateTimeline);
+    });
+    player.addEventListener('pause', () => {
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+      // Update one last time
+      if (player.duration) {
+        timelineProgress.style.width = `${(player.currentTime / player.duration) * 100}%`;
+        timeCurrent.textContent = fmt(player.currentTime);
+      }
+    });
+
+    // Click on timeline to seek
+    timelineTrack.addEventListener('click', (e) => {
+      if (!player.duration) return;
+      const rect = timelineTrack.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      player.currentTime = pct * player.duration;
+    });
+
+    // File input
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files[0]) loadVideo(e.target.files[0]);
+    });
+
+    // Drag & drop
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('drag-over');
+    });
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('drag-over');
+    });
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('video/')) loadVideo(file);
+    });
+
+    // Also accept drop on body when video is already playing (for replace)
+    document.body.addEventListener('dragover', (e) => e.preventDefault());
+    document.body.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('video/')) loadVideo(file);
+    });
+
+    // Pause / Play
+    btnPause.addEventListener('click', () => {
+      if (player.paused) {
+        player.play();
+        iconPause.style.display = '';
+        iconPlay.style.display = 'none';
+      } else {
+        player.pause();
+        iconPause.style.display = 'none';
+        iconPlay.style.display = '';
+      }
+    });
+
+    // Keyboard: Space to toggle, Escape to go back
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        btnPause.click();
+      }
+      if (e.code === 'Escape') {
+        window.location.href = '/';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Aurora Smooth Dynamic Background</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #050814;
+      overflow: hidden;
+    }
+
+    .aurora-bg {
+      position: fixed;
+      inset: 0;
+      background: #050814;
+    }
+
+    .aurora-layer {
+      position: absolute;
+      width: 160%;
+      height: 160%;
+      filter: blur(160px);
+      opacity: 0.75;
+      mix-blend-mode: screen;
+      will-change: transform;
+      animation-timing-function: cubic-bezier(0.45, 0.05, 0.55, 0.95);
+      animation-iteration-count: infinite;
+    }
+
+    .layer-1 {
+      background: radial-gradient(circle at center, #7c7cff, transparent 55%);
+      top: -40%;
+      left: -40%;
+      animation: flow1 14s infinite;
+    }
+
+    .layer-2 {
+      background: radial-gradient(circle at center, #3b82f6, transparent 55%);
+      top: -10%;
+      left: 45%;
+      animation: flow2 18s infinite;
+    }
+
+    .layer-3 {
+      background: radial-gradient(circle at center, #a855f7, transparent 55%);
+      top: 45%;
+      left: -35%;
+      animation: flow3 22s infinite;
+    }
+
+    .layer-4 {
+      background: radial-gradient(circle at center, #22d3ee, transparent 55%);
+      top: 35%;
+      left: 55%;
+      animation: flow4 26s infinite;
+    }
+
+    @keyframes flow1 {
+      0%   { transform: translate(0, 0) scale(1); }
+      50%  { transform: translate(220px, 140px) scale(1.35); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+
+    @keyframes flow2 {
+      0%   { transform: translate(0, 0) scale(1); }
+      50%  { transform: translate(-260px, 180px) scale(1.4); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+
+    @keyframes flow3 {
+      0%   { transform: translate(0, 0) scale(1); }
+      50%  { transform: translate(280px, -220px) scale(1.45); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+
+    @keyframes flow4 {
+      0%   { transform: translate(0, 0) scale(1); }
+      50%  { transform: translate(-320px, -200px) scale(1.5); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .aurora-layer {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="aurora-bg">
+    <div class="aurora-layer layer-1"></div>
+    <div class="aurora-layer layer-2"></div>
+    <div class="aurora-layer layer-3"></div>
+    <div class="aurora-layer layer-4"></div>
+  </div>
+</body>
+</html>

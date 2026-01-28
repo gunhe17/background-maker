@@ -1,0 +1,581 @@
+@import "tailwindcss";
+
+@theme {
+  --color-panel: rgba(10, 10, 25, 0.35);
+}
+
+/* ═══════════════════════════════════════════
+   Panel toolbar buttons
+   ═══════════════════════════════════════════ */
+
+.panel-toolbar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.panel-toolbar-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ═══════════════════════════════════════════
+   Collapsible Panel Sections
+   ═══════════════════════════════════════════ */
+
+.panel-section {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.panel-section-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 0;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  user-select: none;
+}
+
+.panel-section-toggle:hover {
+  opacity: 0.85;
+}
+
+.toggle-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.panel-section.open > .panel-section-toggle > .toggle-chevron {
+  transform: rotate(90deg);
+}
+
+.panel-section-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.02em;
+}
+
+.panel-section-body {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.25s ease;
+  padding: 0 0 0 22px;
+}
+
+.panel-section.open > .panel-section-body {
+  max-height: 2000px;
+  opacity: 1;
+  padding: 0 0 10px 22px;
+}
+
+/* ═══════════════════════════════════════════
+   Per-layer collapsible item (nested)
+   ═══════════════════════════════════════════ */
+
+.layer-configs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.layer-item {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.layer-item-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 7px 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.layer-item-toggle:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.layer-item-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.25);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.layer-item.open > .layer-item-toggle > .layer-item-chevron {
+  transform: rotate(90deg);
+}
+
+.layer-item-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  flex: 1;
+  text-align: left;
+}
+
+.layer-color-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+}
+
+.layer-item-body {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.2s ease, opacity 0.15s ease;
+}
+
+.layer-item.open > .layer-item-body {
+  max-height: 600px;
+  opacity: 1;
+}
+
+.layer-item-content {
+  padding: 6px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ═══════════════════════════════════════════
+   Control rows & inputs
+   ═══════════════════════════════════════════ */
+
+.control-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 0;
+}
+
+.control-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.control-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.control-val {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
+  min-width: 32px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Layer config inner rows ── */
+
+.layer-config-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.layer-config-row-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  min-width: 44px;
+  flex-shrink: 0;
+}
+
+.layer-config-row-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.layer-config-val {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+  min-width: 28px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════════════════════════════════════
+   Hint button (i)
+   ═══════════════════════════════════════════ */
+
+.hint-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 8px;
+  font-weight: 600;
+  font-style: italic;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.hint-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ═══════════════════════════════════════════
+   Tooltip
+   ═══════════════════════════════════════════ */
+
+.hint-tooltip {
+  position: fixed;
+  z-index: 9999;
+  max-width: 300px;
+  padding: 10px 14px;
+  background: rgba(20, 20, 40, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 12px;
+  line-height: 1.5;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.hint-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hint-tooltip .hint-vals {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 6px;
+  padding-top: 5px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hint-tooltip .hint-val {
+  font-size: 11px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.hint-tooltip .hint-val b {
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════
+   Slider
+   ═══════════════════════════════════════════ */
+
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 96px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.slider:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.15s;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+.slider::-webkit-slider-thumb:hover {
+  background: rgba(255, 255, 255, 0.85);
+  transform: scale(1.15);
+}
+
+.slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  border: none;
+  cursor: pointer;
+}
+
+.slider-sm {
+  width: 72px;
+  height: 2px;
+}
+
+/* ═══════════════════════════════════════════
+   Color input
+   ═══════════════════════════════════════════ */
+
+.color-input {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 0.15s;
+}
+
+.color-input:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.color-input::-webkit-color-swatch-wrapper {
+  padding: 2px;
+}
+
+.color-input::-webkit-color-swatch {
+  border: none;
+  border-radius: 3px;
+}
+
+.color-input-sm {
+  width: 22px;
+  height: 22px;
+  border-width: 1.5px;
+  border-radius: 5px;
+}
+
+.color-input-sm::-webkit-color-swatch-wrapper {
+  padding: 1px;
+}
+
+/* ═══════════════════════════════════════════
+   Select / Number inputs
+   ═══════════════════════════════════════════ */
+
+.select-input {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 5px 8px;
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.select-input:focus {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.select-sm {
+  flex: 1;
+  font-size: 11px;
+  padding: 3px 6px;
+}
+
+.number-input {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 5px 8px;
+  font-size: 12px;
+  outline: none;
+  text-align: right;
+  transition: border-color 0.15s;
+}
+
+.number-input:focus {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* ═══════════════════════════════════════════
+   Scrollbar
+   ═══════════════════════════════════════════ */
+
+/* Hide scrollbar but keep scrolling */
+#control-panel {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge legacy */
+}
+
+#control-panel::-webkit-scrollbar {
+  display: none; /* WebKit */
+}
+
+/* ═══════════════════════════════════════════
+   Icon Dropdown (Shape / Motion)
+   ═══════════════════════════════════════════ */
+
+.icon-dropdown {
+  position: relative;
+  flex: 1;
+}
+
+.icon-dropdown-selected {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.icon-dropdown-selected:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.icon-dropdown.open .icon-dropdown-selected {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.icon-dropdown-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 1px;
+}
+
+.icon-dropdown-label {
+  font-size: 11px;
+  flex: 1;
+  text-align: left;
+}
+
+.icon-dropdown-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  text-align: left;
+}
+
+.icon-dropdown-text .icon-dropdown-label {
+  flex: none;
+}
+
+.icon-dropdown-desc {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.35);
+  line-height: 1.4;
+}
+
+.icon-dropdown-arrow {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.25);
+  transition: transform 0.2s ease;
+}
+
+.icon-dropdown.open .icon-dropdown-arrow {
+  transform: rotate(90deg);
+}
+
+.icon-dropdown-menu {
+  position: fixed;
+  z-index: 9999;
+  background: rgba(15, 15, 35, 0.96);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 4px;
+  display: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* menu display controlled via JS (appended to body) */
+
+.icon-dropdown-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 8px;
+  border: none;
+  background: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.12s;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.icon-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.icon-dropdown-item.active {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.9);
+}

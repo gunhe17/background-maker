@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>Background Maker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body class="w-screen h-screen overflow-hidden bg-black relative">
+
+  <!-- Preview Canvas (full screen) -->
+  <canvas id="preview-canvas" class="absolute inset-0 w-full h-full"></canvas>
+
+  <!-- Restore Button (shown when panel minimized) -->
+  <button id="panel-restore"
+    class="fixed top-4 z-50 w-9 h-9 hidden items-center justify-center
+           bg-panel backdrop-blur-2xl text-white/60 hover:text-white hover:bg-white/15
+           rounded-xl border border-white/[0.06] transition-all cursor-pointer text-sm
+           shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
+    style="right: 1rem">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 5h12M2 8h12M2 11h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </button>
+
+  <!-- Control Panel -->
+  <aside id="control-panel"
+    class="fixed top-4 bottom-4 w-80 z-40 bg-panel backdrop-blur-2xl
+           border border-white/[0.06] rounded-2xl overflow-y-auto transition-all duration-300
+           shadow-[0_8px_40px_rgba(0,0,0,0.5)]"
+    style="right: 1rem">
+
+    <div class="p-5 pb-8 space-y-1">
+
+      <!-- Panel toolbar -->
+      <div class="flex items-center gap-1.5 mb-3">
+        <button id="panel-minimize" type="button" class="panel-toolbar-btn" title="패널 최소화">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M3 7h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Header -->
+      <div class="pb-3 mb-2 border-b border-white/[0.06]">
+        <h1 class="text-white/90 text-[15px] font-semibold tracking-tight">Background Maker</h1>
+        <p class="text-white/30 text-[11px] mt-1">Configure your animated background</p>
+      </div>
+
+      <!-- ═══ Global ═══ -->
+      <div class="panel-section" data-section="global">
+        <div class="panel-section-toggle" data-target="global">
+          <span class="toggle-chevron">›</span>
+          <span class="panel-section-label">Global</span>
+        </div>
+        <div class="panel-section-body" id="section-global">
+          <div class="control-row">
+            <div class="control-label">
+              <span>Duration</span>
+              <span class="hint-btn" data-hint="애니메이션의 루프 주기(초)입니다. 프리뷰와 내보내기 모두 이 시간을 기준으로 반복됩니다. 각 레이어의 Cycles 값이 정수이므로, 끝 프레임과 시작 프레임이 수학적으로 정확히 일치합니다.<div class='hint-vals'><span class='hint-val'><b>5~10초</b> 짧고 빠른 루프. 프레젠테이션 배경에 적합</span><span class='hint-val'><b>15~30초</b> 여유로운 루프. 반복이 눈에 덜 띔</span><span class='hint-val'><b>60초 이상</b> 긴 주기. 처리 시간이 크게 증가</span></div>">i</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <input type="text" id="duration" value="10" inputmode="numeric" pattern="[0-9]*" class="number-input w-16" />
+              <span class="text-white/30 text-xs">sec</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Background ═══ -->
+      <div class="panel-section" data-section="background">
+        <div class="panel-section-toggle" data-target="background">
+          <span class="toggle-chevron">›</span>
+          <span class="panel-section-label">Background</span>
+        </div>
+        <div class="panel-section-body" id="section-background">
+          <div class="control-row">
+            <div class="control-label">
+              <span>Color</span>
+              <span class="hint-btn" data-hint="모든 레이어가 그려지기 전에 캔버스 전체를 채우는 바탕색입니다. 레이어 색상은 이 배경 위에 Blend 모드로 합성되므로, 배경색이 최종 결과물의 분위기를 크게 좌우합니다.<br><br>배경색의 밝기(luminance)를 자동 감지하여 Blend 모드가 전환됩니다. Blend를 수동으로 변경하면 자동 전환이 비활성화됩니다.<div class='hint-vals'><span class='hint-val'><b>어두운 색</b> (검정~남색) → Blend가 Screen으로 전환. 레이어 색상이 빛처럼 더해져 네온·오로라 느낌</span><span class='hint-val'><b>밝은 색</b> (흰색~파스텔) → Blend가 Multiply로 전환. 레이어 색상이 잉크처럼 겹쳐져 수채화·염색 느낌</span></div>">i</span>
+            </div>
+            <input type="color" id="bg-color" value="#050814" class="color-input" />
+          </div>
+          <div class="control-row">
+            <div class="control-label">
+              <span>Blend</span>
+              <span class="hint-btn" data-hint="레이어 색상이 배경 위에 합성되는 방식(Canvas globalCompositeOperation)입니다. 같은 레이어 색이라도 Blend 모드에 따라 전혀 다른 결과가 나옵니다.<div class='hint-vals'><span class='hint-val'><b>Screen</b> 각 픽셀의 색을 더하는 방식. 어두운 배경에서 색이 빛처럼 밝아짐. 네온·오로라·발광 효과에 적합</span><span class='hint-val'><b>Multiply</b> 각 픽셀의 색을 곱하는 방식. 밝은 배경에서 색이 잉크처럼 진해짐. 수채화·염색 효과에 적합</span><span class='hint-val'><b>Overlay</b> 밝은 부분은 더 밝게, 어두운 부분은 더 어둡게 만들어 대비를 강조. 비비드하고 선명한 색감</span><span class='hint-val'><b>Soft Light</b> Overlay와 유사하지만 효과가 절반 수준으로 약함. 은은하고 부드러운 색 변화, 차분한 분위기</span></div>">i</span>
+            </div>
+            <select id="blend-mode" class="select-input">
+              <option value="screen">Screen</option>
+              <option value="multiply">Multiply</option>
+              <option value="overlay">Overlay</option>
+              <option value="soft-light">Soft Light</option>
+            </select>
+          </div>
+          <div class="control-row">
+            <div class="control-label">
+              <span>Blur</span>
+              <span class="hint-btn" data-hint="캔버스 전체에 적용되는 가우시안 블러(CSS filter: blur)입니다. 각 레이어의 그라데이션 덩어리 경계를 흐리게 만들어, 덩어리들이 서로 자연스럽게 스며드는 효과를 줍니다. 모든 레이어에 동일하게 적용되며, 레이어별 개별 설정은 불가합니다.<div class='hint-vals'><span class='hint-val'><b>20~60</b> 각 덩어리의 원형·타원 형태가 비교적 뚜렷하게 보임</span><span class='hint-val'><b>100~160</b> 덩어리들이 부드럽게 번져 자연스러운 오로라 느낌 (기본값 160)</span><span class='hint-val'><b>200~300</b> 경계가 거의 사라지고, 색이 넓고 은은하게 퍼져 추상적인 그라데이션</span></div>">i</span>
+            </div>
+            <div class="control-input">
+              <input type="range" id="blur" min="20" max="300" value="160" step="5" class="slider" />
+              <span id="blur-val" class="control-val">160</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Layers ═══ -->
+      <div class="panel-section" data-section="layers">
+        <div class="panel-section-toggle" data-target="layers">
+          <span class="toggle-chevron">›</span>
+          <span class="panel-section-label">Layers</span>
+        </div>
+        <div class="panel-section-body" id="section-layers">
+          <div class="control-row">
+            <div class="control-label">
+              <span>Count</span>
+              <span class="hint-btn" data-hint="화면에 표시할 색상 덩어리의 수입니다.<div class='hint-vals'><span class='hint-val'><b>1~2개</b> 단순하고 깔끔한 배경</span><span class='hint-val'><b>3~4개</b> 다양한 색이 자연스럽게 어우러짐</span><span class='hint-val'><b>5~6개</b> 복잡하고 풍성한 색감</span></div>">i</span>
+            </div>
+            <div class="control-input">
+              <input type="range" id="layer-count" min="1" max="6" value="4" class="slider" />
+              <span id="layer-count-val" class="control-val w-5">4</span>
+            </div>
+          </div>
+          <div id="layer-configs" class="layer-configs-list">
+            <!-- Dynamically generated per-layer collapsible blocks -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Export ═══ -->
+      <div class="panel-section" data-section="export">
+        <div class="panel-section-toggle" data-target="export">
+          <span class="toggle-chevron">›</span>
+          <span class="panel-section-label">Export</span>
+        </div>
+        <div class="panel-section-body" id="section-export">
+          <div class="control-row">
+            <div class="control-label">
+              <span>Resolution</span>
+              <span class="hint-btn" data-hint="영상의 가로×세로 픽셀 수입니다. 해상도가 높을수록 파일이 크고 처리가 오래 걸립니다.<div class='hint-vals'><span class='hint-val'><b>1920×1080</b> 일반 모니터용 (Full HD)</span><span class='hint-val'><b>3840×2160</b> 고해상도 모니터용 (4K)</span></div>">i</span>
+            </div>
+            <select id="resolution" class="select-input">
+              <option value="1920x1080">1920 × 1080</option>
+              <option value="3840x2160">3840 × 2160</option>
+            </select>
+          </div>
+          <div class="control-row">
+            <div class="control-label">
+              <span>FPS</span>
+              <span class="hint-btn" data-hint="1초당 이미지 장수입니다.<div class='hint-vals'><span class='hint-val'><b>30</b> 일반적인 영상 수준</span><span class='hint-val'><b>60</b> 더 매끄러운 움직임 (처리 시간 2배)</span></div>">i</span>
+            </div>
+            <select id="fps" class="select-input">
+              <option value="30">30</option>
+              <option value="60" selected>60</option>
+            </select>
+          </div>
+          <button id="export-btn"
+            class="w-full mt-3 py-2 bg-white/[0.08] hover:bg-white/[0.12] text-white/80 hover:text-white
+                   text-[13px] font-medium rounded-lg border border-white/[0.08]
+                   transition-all cursor-pointer active:scale-[0.98]">
+            Export Video
+          </button>
+          <div class="mt-2 text-right">
+            <a href="./tester.html"
+              class="text-white/25 hover:text-white/50 text-[11px] underline transition-colors">
+              Test Loop
+            </a>
+          </div>
+          <!-- Progress -->
+          <div id="export-progress" class="hidden space-y-2 mt-2">
+            <div class="w-full bg-white/[0.06] rounded-full h-1.5 overflow-hidden">
+              <div id="progress-bar" class="bg-indigo-400/80 h-1.5 rounded-full transition-all duration-200" style="width: 0%"></div>
+            </div>
+            <p id="progress-text" class="text-white/40 text-[11px] text-center">Preparing...</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- Tooltip -->
+  <div id="hint-tooltip" class="hint-tooltip"></div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
