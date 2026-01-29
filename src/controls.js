@@ -444,11 +444,34 @@ document.addEventListener('mouseenter', (e) => {
   clearTimeout(hideTimeout);
   tooltip.innerHTML = hint;
 
-  const rect = btn.getBoundingClientRect();
-  const tooltipWidth = 300;
-  tooltip.style.left = `${rect.left - tooltipWidth - 8}px`;
-  tooltip.style.top = `${rect.top - 4}px`;
+  // Make visible off-screen first to measure actual size
+  tooltip.style.left = '-9999px';
+  tooltip.style.top = '-9999px';
   tooltip.classList.add('visible');
+
+  const rect = btn.getBoundingClientRect();
+  const tooltipRect = tooltip.getBoundingClientRect();
+  const gap = 8;
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
+  // Try left side first, fallback to right if not enough space
+  let left = rect.left - tooltipRect.width - gap;
+  if (left < gap) {
+    left = rect.right + gap;
+  }
+
+  // Vertical: align top with button, but keep within viewport
+  let top = rect.top;
+  if (top + tooltipRect.height > viewportHeight - gap) {
+    top = viewportHeight - tooltipRect.height - gap;
+  }
+  if (top < gap) {
+    top = gap;
+  }
+
+  tooltip.style.left = `${left}px`;
+  tooltip.style.top = `${top}px`;
 }, true);
 
 document.addEventListener('mouseleave', (e) => {
